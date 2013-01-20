@@ -436,6 +436,7 @@ function onLoad(){
                     //document.getElementById('matches').innerHTML += matches[x]+"<br/>";
                     // regex comes in handy for dealing with these match strings
                     speechItem = matches[x];
+                    console.log(matches[x]);
                 }
             }
         }
