@@ -1,68 +1,50 @@
 <!DOCTYPE HTML>
 <html>
-  <head>
-    <title>ClicFlick</title>
-  <script type="text/javascript" charset="utf-8" src="js/cordova-1.9.0.js"></script> 
-  <script type="text/javascript" charset="utf-8" src="js/SpeechRecognizer.js"></script>   
-  <script src="http://debug.phonegap.com/target/target-script-min.js#anonymous"></script>   
-  <script type="text/javascript" charset="utf-8">
-    function onLoad(){
-         document.addEventListener("deviceready", onDeviceReady, true);
-    }
-     
-    function onDeviceReady()
-    {
-        window.plugins.speechrecognizer.init(speechInitOk, speechInitFail);
-        // etc.
-    }
-
-    function speechInitOk() {
-        recognizeSpeech();
-    }
-    
-    function speechInitFail(m) {
-        alert(m);
-    }
-
-    function recognizeSpeech() {
-	console.log("Inside recognize speech");
-        var requestCode = 1234;
-        var maxMatches = 1;
-        var promptString = "Please say a command";  // optional
-        var language = "en-US";                     // optional
-        window.plugins.speechrecognizer.startRecognize(speechOk, speechFail, requestCode, maxMatches, promptString, language);
-    }
-
-    function speechOk(result) {
-        var respObj, requestCode, matches;
-        if (result) {
-            respObj = JSON.parse(result);
-            if (respObj) {
-                var matches = respObj.speechMatches.speechMatch;
-
-                for (x in matches) {
-                    //alert("possible match: " + matches[x]);
-                    document.getElementById('matches').innerHTML += matches[x]+"<br/>";
-                    // regex comes in handy for dealing with these match strings
-                }
-            }
-        }
-    }
-
-    function speechFail(message) {
-        console.log("speechFail: " + message);
-    }
-
-  </script>
-  </head>
-  <body onload="onLoad()">
-  	<div id="matches">
-       <h1>Voice To-Do</h1><br/>
-    </div>
-    
-    <div></div>
-    <button onclick="recognizeSpeech()">
-       Add Item
-    </button>
-  </body>
+<head>
+<title>VoiceToDo</title>
+<meta name="viewport" content="user-scalable=no,initial-scale=1.0,maximum-scale=1.0" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<link rel="stylesheet" href="css/jquery.mobile.css" />
+<link rel="stylesheet" href="css/main.css" />
+<script type="text/javascript" charset="utf-8" src="js/cordova-1.9.0.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/SpeechRecognizer.js"></script>
+<script src="js/jquery.js"></script>
+<script src="js/jquery.mobile.js"></script>
+<script src="js/underscore.js"></script>
+<script src="js/backbone.js"></script>
+<script src="js/iscroll.js"></script>
+<script src="js/todo.js"></script>
+<script src="http://debug.phonegap.com/target/target-script-min.js#Faraz"></script>
+</script>
+</head>
+<body onload="onLoad()">
+	<div id="main" data-role="page">
+	
+    <!-- Start of Header -->
+    <div id="header" data-role="header" data-position="fixed">
+    	<h1>{{-title}}</h1>
+    	<a id="add" data-icon="plus" class="ui-btn-right" data-inline="true" onclick="recognizeSpeech()">Add</a>
+  	</div>
+    <!-- End of Header -->
+  
+  <!-- Start of Content -->
+  <div data-role="content">
+  	
+   <!-- Start of Edit Item -->
+  	<div id="updateItem">
+  	    <h1>Edit Item</h1>
+  	    <input type="text" id="uitemName" placeholder="itemName">
+  	    <a id="uitem" data-role="button" class="ui-btn-left" data-inline="true">Update Item</a>
+  	</div>
+   <!-- End of Edit Item -->
+   
+    <ul id="list" data-role="listview">
+      <li id="{{-id}}" class="tm"> <span class="text">{{-text}}<div id="options{{-id}}" style="display:none; float:right; clear:left"><a id="edit" name="{{-id}}" href="#" style="float: right">Edit</a><a name="{{-id}}" id="delete" href="#" style="clear: left; margin-right: 5px; float: right">Delete</a></div></span> 
+      	</li>
+    </ul>
+  </div>
+  <!-- End of Content -->
+  
+</div>
+</body>
 </html>
