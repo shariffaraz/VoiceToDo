@@ -117,6 +117,9 @@ bb.init = function() {
         itemAddition : function() {
             var self = this
             recognizeSpeech();
+            
+            while(speechItem==""){}
+            
             var time = new Date()
             var mm = time.getMonth() 
             var dd = time.getDate()
@@ -129,10 +132,11 @@ bb.init = function() {
                 created : date,
                 location : address
             })
+          
+            
 
             getHTTPRequest("/api/rest/create/" + $("#itemName").val() + "/" + date + "/" + "waterford")
             $("#itemName").val("")
-            $("#addItem").slideUp()
             $("#close").hide()
             $("#add").show()
             self.add(item)
@@ -165,7 +169,7 @@ bb.init = function() {
         events : {
             'click #add' : function() {
                 var self = this
-                self.items.addItemdiv()
+                self.items.itemAddition()
             },
             'click #close' : function() {
                 var self = this;
@@ -214,7 +218,7 @@ bb.init = function() {
     
     //Enter Item
 
-    bb.view.AddItem = Backbone.View.extend(_.extend({
+ /*   bb.view.AddItem = Backbone.View.extend(_.extend({
         events : {
             'tap #item' : function() {
                 var self = this;
@@ -234,7 +238,7 @@ bb.init = function() {
             $("#add").hide()
             $("#close").show()
         }
-    }))
+    })) */
 
     //view Listing
 
@@ -436,7 +440,6 @@ function onLoad(){
                     //document.getElementById('matches').innerHTML += matches[x]+"<br/>";
                     // regex comes in handy for dealing with these match strings
                     speechItem = matches[x];
-                    console.log(matches[x]);
                 }
             }
         }
