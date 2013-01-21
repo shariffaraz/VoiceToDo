@@ -2,49 +2,79 @@
 <html>
 <head>
 <title>VoiceToDo</title>
-<meta name="viewport" content="user-scalable=no,initial-scale=1.0,maximum-scale=1.0" />
+<meta name="viewport"
+	content="user-scalable=no,initial-scale=1.0,maximum-scale=1.0" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <link rel="stylesheet" href="css/jquery.mobile.css" />
 <link rel="stylesheet" href="css/main.css" />
 <script type="text/javascript" charset="utf-8" src="js/cordova-1.9.0.js"></script>
-<script type="text/javascript" charset="utf-8" src="js/SpeechRecognizer.js"></script>
+<script type="text/javascript" charset="utf-8"
+	src="js/SpeechRecognizer.js"></script>
 <script src="js/jquery.js"></script>
 <script src="js/jquery.mobile.js"></script>
 <script src="js/underscore.js"></script>
 <script src="js/backbone.js"></script>
 <script src="js/iscroll.js"></script>
+<!-- cordova facebook plugin -->
+<script src="js/cdv-plugin-fb-connect.js"></script>
+<!-- facebook js sdk -->
+<script src="js/facebook_js_sdk.js"></script>
 <script src="js/todo.js"></script>
-<script src="http://debug.phonegap.com/target/target-script-min.js#Faraz"></script>
+
+
+<script
+	src="http://debug.phonegap.com/target/target-script-min.js#FarazSharif"></script>
+
 
 </head>
 <body onload="onLoad()">
 	<div id="main" data-role="page">
-	
-    <!-- Start of Header -->
-    <div id="header" data-role="header" data-position="fixed">
-    	<h1>Voice Todo&nbsp;&nbsp;&nbsp;&nbsp;{{-title}}</h1>
-    	<a id="add" data-icon="plus" class="ui-btn-right" data-inline="true">Add</a>
-  	</div>
-    <!-- End of Header -->
-  
-  <!-- Start of Content -->
-  <div data-role="content">
-  	
-   <!-- Start of Edit Item -->
-  	<div id="updateItem">
-  	    <h1>Edit Item</h1>
-  	    <input type="text" id="uitemName" placeholder="itemName">
-  	    <a id="uitem" data-role="button" class="ui-btn-left" data-inline="true">Update Item</a>
-  	</div>
-   <!-- End of Edit Item -->
-   
-    <ul id="list" data-role="listview">
-      <li id="{{-id}}" class="tm"> <span class="text">{{-text}}<div id="options{{-id}}" style="display:none; float:right; clear:left"><a id="edit" name="{{-id}}" href="#" style="float: right">Edit</a><a name="{{-id}}" id="delete" href="#" style="clear: left; margin-right: 5px; float: right">Delete</a></div></span> 
-      	</li>
-    </ul>
-  </div>
-  <!-- End of Content -->
-  
-</div>
+
+		<!-- Start of Header -->
+		<div id="header" data-role="header" data-position="fixed">
+			<div id="status">
+				<div id="welcome">
+					<img id="user-picture" width="50" height="50" />
+					<div id="user-name"></div>
+				</div>
+			</div>
+			<a id="login" data-icon="plus" class="ui-btn-left" data-inline="true"
+				onclick="login()">Login</a>
+			<h1>Voice Todo&nbsp;{{-title}}</h1>
+			<br /> <a id="add" data-icon="plus" class="ui-btn-right"
+				data-inline="true">Add</a>
+		</div>
+		<!-- End of Header -->
+
+		<!-- Start of Content -->
+		<div id="content" data-role="content">
+
+			<!-- Start of Edit Item -->
+			<div id="updateItem">
+				<h1>Edit Item</h1>
+				<input type="text" id="uitemName" placeholder="itemName"> <a
+					id="uitem" data-role="button" class="ui-btn-left"
+					data-inline="true">Update Item</a>
+			</div>
+			<!-- End of Edit Item -->
+
+			<ul id="list" data-role="listview">
+				<li id="{{-id}}" class="tm"><span class="text">{{-text}}
+						<div id="options{{-id}}"
+							style="display: none; float: right; clear: left">
+							<a id="edit" name="{{-id}}" href="#" style="float: right">Edit</a>
+							<a name="{{-id}}" id="delete" href="#"
+								style="clear: left; margin-right: 5px; float: right">Delete</a>
+							<a name="{{-id}}" id="share" href="#" style="clear: left; margin-right: 5px; float: right" >Share</a>
+						</div>
+				</span></li>
+			</ul>
+
+
+
+		</div>
+		<!-- End of Content -->
+
+	</div>
 </body>
 </html>

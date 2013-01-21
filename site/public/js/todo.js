@@ -39,14 +39,12 @@ browser.iphone = !browser.android
 
 var app = {
     model : {},
-    view : {},
-    router : {}
+    view : {}
 }
 
 var bb = {
     model : {},
-    view : {},
-    router : {}
+    view : {}
 }
 
 bb.init = function() {
@@ -241,6 +239,12 @@ bb.init = function() {
 
             'tap #toggle' : function(e) {
                 $("#options" + e.target.name).hide()
+            },
+            
+            'tap #share' : function(e) {
+                var self=this
+                var item = self.items.get(e.target.name)
+                facebookWallPost(item.get('text'));
             }
         },
 
@@ -391,13 +395,23 @@ $(app.init)
 //Speech recognition code
 
 function onLoad(){
-         
+    
          document.addEventListener("deviceready", onDeviceReady, true);
     }
      
     function onDeviceReady()
     {
-        console.log("Device is now ready");
+        try {
+            FB.init({ appId: "140675349424419", nativeInterface: CDV.FB, useCachedDialogs: false });
+            if(getLoginStatus()==0)
+            {
+                login();
+            }
+            
+            //document.getElementById('data').innerHTML = getLoginStatus();
+            } catch (e) {
+            alert(e);
+            }
         window.plugins.speechrecognizer.init(speechInitOk, speechInitFail);
     }
 
@@ -435,4 +449,138 @@ function onLoad(){
 
     function speechFail(message) {
         console.log("speechFail: " + message);
+    }
+    
+    if ((typeof cordova == 'undefined') && (typeof Cordova == 'undefined')) alert('Cordova variable does not exist. Check that you have included cordova.js correctly');
+    if (typeof CDV == 'undefined') alert('CDV variable does not exist. Check that you have included cdv-plugin-fb-connect.js correctly');
+    if (typeof FB == 'undefined') alert('FB variable does not exist. Check that you have included the Facebook JS SDK file.');
+    
+    FB.Event.subscribe('auth.login', function(response) {
+                       //alert('auth.login event');
+                       });
+    
+    FB.Event.subscribe('auth.logout', function(response) {
+                       //alert('auth.logout event');
+                       });
+    
+    FB.Event.subscribe('auth.sessionChange', function(response) {
+                       //alert('auth.sessionChange event');
+                       });
+    
+    FB.Event.subscribe('auth.statusChange', handleStatusChange);
+    
+    function getSession() {
+        alert("session: " + JSON.stringify(FB.getSession()));
+    }
+    
+    
+    function getLoginStatus() {
+    var status = 0;
+        FB.getLoginStatus(function(response) {
+                var user = response
+                          if (response.status == 'connected') {
+                            status = 1;        
+                          } else {
+                            status = 0;
+                          }
+                          });
+                          return status;
+    }
+    
+    function handleStatusChange(session) {
+    console.log('Got the user\'s session: ', session);
+    //alert("inside handle")
+    if (session.authResponse) {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("welcome").style.display = "block";
+    document.getElementById("content").style.top = "130px";
+    //Fetch user's id, name, and picture
+    FB.api('/me', {
+      fields: 'name, picture'
+    },
+    function(response) {
+      if (!response.error) {
+        user = response;
+    
+    console.log('Got the user\'s name and picture: ');
+    console.log(response);
+    
+    //Update display of user name and picture
+    if (document.getElementById('user-name')) {
+      document.getElementById('user-name').innerHTML = user.name;
+    }
+    if (document.getElementById('user-picture')) {
+      if (user.picture.data) {
+          document.getElementById('user-picture').src = user.picture.data.url;
+      } else {
+          document.getElementById('user-picture').src = user.picture;
+      }
+    }
+  }
+  
+  clearAction();
+});
+} else {
+//document.body.className = 'not_connected';
+
+//clearAction();
+}
+}
+
+   
+    
+    function logout() {
+        FB.logout(function(response) {
+                  alert('logged out');
+                  });
+    }
+    
+    function login() {
+        FB.login(
+                 function(response) {
+                 if (response.session) {
+                 alert('logged in');
+                 } else {
+                 //alert('not logged in');
+                 }
+                 },
+                 { scope: "email" }
+                 );
+    }
+    
+    
+    function facebookWallPost(itemName) {
+        console.log('Debug 1');
+        var params = {
+            method: 'feed',
+            name: itemName,
+            link: 'ec2-54-228-3-69.eu-west-1.compute.amazonaws.com',
+            picture: 'http://www.iconshock.com/img_jpg/STROKE/networking/jpg/256/voice_icon.jpg',
+            caption: 'Voice ToDo Application',
+            description: 'This Share is from my VoiceToDo Applciation'
+          };
+        console.log(params);
+        FB.ui(params, function(obj) { console.log(obj);});
+    }
+    
+    function publishStoryFriend() {
+        randNum = Math.floor ( Math.random() * friendIDs.length ); 
+
+        var friendID = friendIDs[randNum];
+        if (friendID == undefined){
+            alert('please click the me button to get a list of friends first');
+        }else{
+            console.log("friend id: " + friendID );
+            console.log('Opening a dialog for friendID: ', friendID);
+            var params = {
+                method: 'feed',
+                to: friendID.toString(),
+                name: 'Facebook Dialogs',
+                link: 'https://developers.facebook.com/docs/reference/dialogs/',
+                picture: 'http://fbrell.com/f8.jpg',
+                caption: 'Reference Documentation',
+                description: 'Dialogs provide a simple, consistent interface for applications to interface with users.'
+            };
+            FB.ui(params, function(obj) { console.log(obj);});
+        }
     }

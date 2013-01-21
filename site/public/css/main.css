@@ -6,11 +6,16 @@
 div[data-role='content'] {
     overflow: hidden;
     position: fixed;
-    top: 40px;
+    top: 60px;
     bottom: -60px;
     left: 0px;
     right: 0px;
 }
+
+#welcome {
+	display:none;
+}
+
 
 #addItem {
 	display:none;
