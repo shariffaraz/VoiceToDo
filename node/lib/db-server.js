@@ -52,11 +52,12 @@ console.log("connected to DB")
 
   var router = connect.router( function( app ) {
   	app.get('api/ping', api.ping)
-    app.get('/api/rest/create/:text/:created/:location',    api.rest.create)
+    app.get('/api/rest/create/:text/:created/:location/:complete',    api.rest.create)
     app.get('/api/rest/todo/:id', api.rest.read)
     app.get('/api/rest/todo',     api.rest.list)
     app.get('/api/rest/update/:id/:text', api.rest.update)
     app.get('/api/rest/del/:id', api.rest.del)
+    app.get('/api/rest/complete/:id/:complete', api.rest.complete)
   })
   server.use(router)
 

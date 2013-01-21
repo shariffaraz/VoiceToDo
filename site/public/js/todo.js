@@ -80,7 +80,8 @@ bb.init = function() {
             id : '',
             text : '',
             created : new Date().getTime(),
-            location : ""
+            location : "",
+            complete : false
         },
 
         initialize : function() {
@@ -106,20 +107,14 @@ bb.init = function() {
                 self.count = self.length
             })
         },
-        addItemdiv : function() {
-            app.view.addItem.render()
-        },
+        
         start : function() {
-            $("#addItem").slideUp()
             $("#updateItem").slideUp()
             app.view.head.render()
         },
         itemAddition : function() {
+            console.log("inside item addition");
             var self = this
-            recognizeSpeech();
-            
-            while(speechItem==""){}
-            
             var time = new Date()
             var mm = time.getMonth() 
             var dd = time.getDate()
@@ -130,15 +125,14 @@ bb.init = function() {
                 id : self.count + 1,
                 text : speechItem,
                 created : date,
-                location : address
+                location : "",
+                complete : false
             })
           
             
-
-            getHTTPRequest("/api/rest/create/" + $("#itemName").val() + "/" + date + "/" + "waterford")
-            $("#itemName").val("")
-            $("#close").hide()
-            $("#add").show()
+            console.log("SpeechItem "+speechItem);
+            getHTTPRequest("/api/rest/create/" + speechItem + "/" + date + "/" + "waterford" + "/" + "false")
+            speechItem = "";
             self.add(item)
             self.count++
             item.save()
@@ -169,7 +163,7 @@ bb.init = function() {
         events : {
             'click #add' : function() {
                 var self = this
-                self.items.itemAddition()
+                recognizeSpeech();
             },
             'click #close' : function() {
                 var self = this;
@@ -202,7 +196,7 @@ bb.init = function() {
         render : function() {
             console.log("rendering head")
             var self = this
-            $("#close").hide()
+            //$("#close").hide()
             var loaded = 'loaded' == app.model.state.get('items')
 
             self.elem.title.html(self.tm.title({
@@ -215,31 +209,6 @@ bb.init = function() {
         }
     }))
 
-    
-    //Enter Item
-
- /*   bb.view.AddItem = Backbone.View.extend(_.extend({
-        events : {
-            'tap #item' : function() {
-                var self = this;
-                self.items.itemAddition()
-            }
-        },
-
-        initialize : function(items) {
-            var self = this
-            _.bindAll(self)
-            self.items = items
-            self.setElement("div[data-role='content']")
-        },
-        render : function() {
-
-            $("#addItem").slideDown()
-            $("#add").hide()
-            $("#close").show()
-        }
-    })) */
-
     //view Listing
 
     bb.view.List = Backbone.View.extend(_.extend({
@@ -249,6 +218,12 @@ bb.init = function() {
                 var self = this;
                 self.itemDelete(e.target.name)
                 $("#options" + e.target.name).hide()
+            },
+            
+            'swiperight' : function(e) {
+                var self = this;
+                self.itemComplete(e.target.id)
+                
             },
 
             'tap #edit' : function(e) {
@@ -260,14 +235,12 @@ bb.init = function() {
             'tap' : function(e) {
                 var self = e.target;
                 $("#options" + e.target.id).show()
-                $("#todoDetails" + e.target.id).slideDown()
                 var id = e.target.id
 
             },
 
             'tap #toggle' : function(e) {
                 $("#options" + e.target.name).hide()
-                $("#todoDetails" + e.target.name).slideUp()
             }
         },
 
@@ -292,6 +265,7 @@ bb.init = function() {
             self.$el.empty()
 
             self.items.each(function(item) {
+                
                 self.itemAppend(item)
             })
         },
@@ -300,6 +274,11 @@ bb.init = function() {
             var self = this
             var html = self.tm.item(item.toJSON())
             self.$el.append(html)
+            if(item.get("complete")=="true")
+                    {
+                        console.log("inside complete check");
+                        $("#"+item.get("id")).css('text-decoration', 'line-through')
+                    }
             self.scroll()
         },
 
@@ -318,6 +297,16 @@ bb.init = function() {
                 }
             })
         },
+        
+        itemComplete : function(id){
+            console.log("Inside swipe item id: "+id);
+            var self = this
+            var item = self.items.get(id);
+            item.set("complete", true);
+            $("#"+id).css('text-decoration','line-through')
+            getHTTPRequest("/api/rest/complete/" + id + "/" + "true")
+            //self.render()
+        },
 
         itemUpdate : function(id) {
             var self = this
@@ -331,7 +320,7 @@ bb.init = function() {
                 getHTTPRequest("/api/rest/update/" + id + "/" + $("#uitemName").val())
                 self.render()
                 $("#updateItem").slideUp()
-                $("#close").hide()
+                //$("#close").hide()
                 $("#add").show()
                 app.view.head.render()
             })
@@ -382,7 +371,6 @@ app.init = function() {
 
     app.view.head.render()
     app.view.list = new bb.view.List(app.model.items)
-    app.view.addItem = new bb.view.AddItem(app.model.items)
     app.view.list.render()
 
     app.model.items.fetch({
@@ -403,13 +391,14 @@ $(app.init)
 //Speech recognition code
 
 function onLoad(){
+         
          document.addEventListener("deviceready", onDeviceReady, true);
     }
      
     function onDeviceReady()
     {
+        console.log("Device is now ready");
         window.plugins.speechrecognizer.init(speechInitOk, speechInitFail);
-        // etc.
     }
 
     function speechInitOk() {
@@ -436,10 +425,9 @@ function onLoad(){
                 var matches = respObj.speechMatches.speechMatch;
 
                 for (x in matches) {
-                    //alert("possible match: " + matches[x]);
-                    //document.getElementById('matches').innerHTML += matches[x]+"<br/>";
-                    // regex comes in handy for dealing with these match strings
                     speechItem = matches[x];
+                    console.log(speechItem);
+                    app.model.items.itemAddition();
                 }
             }
         }

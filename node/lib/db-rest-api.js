@@ -52,6 +52,8 @@ exports.rest = {
     var text = req.params.text
     var created = req.params.created
     var location = req.params.location
+    var complete = req.params.complete
+
     /*if( !util.validate(input) ) {
       return res.send$(400, 'invalid')
     }*/
@@ -59,7 +61,8 @@ exports.rest = {
     var todo = {
       text: text,
       created: created,
-      location: location
+      location: location,
+      complete: complete
     }
 
     todocoll.insert(todo, res.err$(res,function( docs ){
@@ -120,6 +123,27 @@ exports.rest = {
 
     var query = util.fixid( {id:id} )
     todocoll.update( query, {$set:{text:text}}, res.err$( function( count ) {
+      if( 0 < count ) {
+        var output = util.fixid( doc )
+        res.sendjson$( output )
+      }
+      else {
+        console.log('404')
+        res.send$(404,'not found')
+      }
+    }))
+  },
+
+  complete: function( req, res ) {
+    var id    = req.params.id
+    var complete = req.params.complete
+    console.log("input is: "+complete)
+    /*if( !util.validate(text) ) {
+      return res.send$(400, 'invalid')
+    }*/
+
+    var query = util.fixid( {id:id} )
+    todocoll.update( query, {$set:{complete:complete}}, res.err$( function( count ) {
       if( 0 < count ) {
         var output = util.fixid( doc )
         res.sendjson$( output )
